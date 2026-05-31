@@ -113,6 +113,7 @@ section {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 500px; /* Force minimum height for charts */
 }
 
 .panel-header {
@@ -259,6 +260,7 @@ section {
   height: 100%;
   min-height: 400px;
   position: relative;
+  display: flex;
 }
 
 /* Select Styling */
@@ -289,3 +291,34 @@ select {
 
 .btn-primary:active { transform: scale(0.98); }
 .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.input-label {
+  display: block;
+  font-size: 0.75rem;
+  color: var(--text-light);
+  margin-bottom: 0.4rem;
+  font-weight: 500;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.6rem;
+  border-radius: 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  font-size: 0.85rem;
+  transition: all 0.2s;
+}
+
+.btn-outline:hover:not(:disabled) {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+.selection-group.secondary {
+  border-top: 1px solid var(--border);
+  padding-top: 1.25rem;
+  margin-top: 0.5rem;
+}

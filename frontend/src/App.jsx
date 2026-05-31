@@ -123,8 +123,8 @@ function App() {
             <section className="control-panel">
               <ColumnSelector 
                 schema={schema} 
-                config={chartConfig} 
-                setConfig={setChartConfig} 
+                activeConfig={chartConfig} 
+                onApplyConfig={(newConfig) => setChartConfig(newConfig)}
                 onRunAnomalies={runAnomalyDetection}
               />
               
