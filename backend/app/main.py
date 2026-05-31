@@ -2,27 +2,27 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 
+from app.core.config import Config
+from app.core.security import allowed_file
 from app.services.data_engine import DataEngine
 from app.services.ml_engine import MLEngine
 from app.services.llm_agent import LLMAgent
 
 app = Flask(__name__)
-CORS(app) # Enable CORS for frontend integration
+app.config.from_object(Config)
+CORS(app)
 
 # --- Endpoints ---
 
 @app.route("/upload", methods=["POST"])
 def upload_file():
-    """
-    Ingests CSV/Excel files, cleans data, and returns structured JSON + schema.
-    """
     try:
         if 'file' not in request.files:
             return jsonify({"error": "No file part"}), 400
         
         file = request.files['file']
-        if file.filename == '':
-            return jsonify({"error": "No selected file"}), 400
+        if file.filename == '' or not allowed_file(file.filename):
+            return jsonify({"error": "Invalid file format. Only CSV and Excel are allowed."}), 400
 
         content = file.read()
         result = DataEngine.parse_and_clean(content, file.filename)
@@ -32,9 +32,6 @@ def upload_file():
 
 @app.route("/detect-anomalies", methods=["POST"])
 def detect_anomalies():
-    """
-    Identifies statistical outliers in the provided data for selected columns.
-    """
     try:
         payload = request.get_json()
         data = payload.get("data")
@@ -50,9 +47,6 @@ def detect_anomalies():
 
 @app.route("/explain-anomalies", methods=["POST"])
 def explain_anomalies():
-    """
-    Generates human-readable insights for detected anomalies using LLM.
-    """
     try:
         payload = request.get_json()
         data = payload.get("data")
@@ -69,9 +63,6 @@ def explain_anomalies():
 
 @app.route("/query-chart", methods=["POST"])
 def query_chart():
-    """
-    Uses LLM to suggest the best chart type and axis mapping based on user query.
-    """
     try:
         payload = request.get_json()
         schema_info = payload.get("schema_info")
@@ -87,4 +78,4 @@ def query_chart():
         return jsonify({"error": str(e)}), 500
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8000, debug=True)
+    app.run(host="0.0.0.0", port=Config.PORT, debug=Config.DEBUG)
