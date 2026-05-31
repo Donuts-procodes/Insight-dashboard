@@ -16,7 +16,7 @@ const DataViewTable = ({ data, anomalies }) => {
                     </tr>
                 </thead>
                 <tbody>
-                    {data.slice(0, 50).map((row, idx) => (
+                    {data.map((row, idx) => (
                         <tr 
                             key={idx} 
                             className={anomalies.includes(idx) ? 'anomaly-row' : ''}
@@ -28,9 +28,6 @@ const DataViewTable = ({ data, anomalies }) => {
                     ))}
                 </tbody>
             </table>
-            {data.length > 50 && (
-                <p className="table-footer">Showing first 50 of {data.length} rows</p>
-            )}
         </div>
     );
 };
