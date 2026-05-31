@@ -7,11 +7,11 @@ import {
 
 const ChartViewer = ({ data, config }) => {
     const themeColors = {
-        primary: "#8ab4f8",
+        primary: "#818cf8",
         secondary: "#c58af9",
-        grid: "#3c4043",
-        text: "#9e9e9e",
-        pie: ["#8ab4f8", "#c58af9", "#81c995", "#f28b82", "#fdd663"]
+        grid: "#27272a",
+        text: "#a1a1aa",
+        pie: ["#818cf8", "#c58af9", "#34d399", "#f87171", "#fbbf24"]
     };
 
     const chartData = useMemo(() => {
@@ -35,13 +35,16 @@ const ChartViewer = ({ data, config }) => {
         const dataSet = config.chartType === 'scatter' ? data : data.slice(0, 500);
 
         return dataSet.map(item => {
-            const yRaw = String(item[config.yAxis]);
+            const rawVal = item[config.yAxis];
+            const yRaw = rawVal !== null && rawVal !== undefined ? String(rawVal) : "0";
             // Extract numbers including decimals and negative signs
-            const yValue = parseFloat(yRaw.replace(/[^\d.-]/g, ""));
+            const parsed = parseFloat(yRaw.replace(/[^\d.-]/g, ""));
+            const yValue = isNaN(parsed) ? 0 : parsed;
+            
             return {
                 ...item,
-                [config.xAxis]: item[config.xAxis],
-                [config.yAxis]: isNaN(yValue) ? 0 : yValue
+                [config.xAxis]: item[config.xAxis] !== null && item[config.xAxis] !== undefined ? item[config.xAxis] : 'N/A',
+                [config.yAxis]: yValue
             };
         });
     }, [data, config.xAxis, config.yAxis, config.chartType]);
@@ -131,8 +134,8 @@ const ChartViewer = ({ data, config }) => {
     };
 
     return (
-        <div className="chart-container-wrapper">
-            <ResponsiveContainer width="99%" height="100%">
+        <div style={{ width: '100%', height: '100%', minHeight: '300px' }}>
+            <ResponsiveContainer width="100%" height="100%">
                 {renderChart()}
             </ResponsiveContainer>
         </div>

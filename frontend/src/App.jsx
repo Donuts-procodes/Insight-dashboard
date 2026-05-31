@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Brain, LayoutDashboard, Info, ArrowLeft, BarChart, Target } from 'lucide-react';
 import FileUpload from './components/FileUpload';
@@ -31,13 +31,10 @@ function App() {
       setAnomalies([]);
       setAiInsight(null);
 
-      // --- Smart Auto-Configuration ---
       if (schema && schema.length >= 2) {
-        // Try to find a numeric column for Y-axis
         const numCol = schema.find(col => 
           col.type.includes('int') || col.type.includes('float') || col.type.includes('number')
         );
-        
         const xAxis = schema[0].name;
         const yAxis = numCol ? numCol.name : schema[1].name;
 
@@ -49,7 +46,7 @@ function App() {
       }
 
       setIsLoading(false);
-    }, 1500);
+    }, 1000);
   };
 
   const resetDashboard = () => {
@@ -63,14 +60,12 @@ function App() {
 
   const runAnomalyDetection = async () => {
     if (!chartConfig.xAxis || !chartConfig.yAxis) return;
-
     setIsLoading(true);
     try {
       const detectRes = await axios.post('http://localhost:8000/detect-anomalies', {
         data: data,
         selected_columns: [chartConfig.xAxis, chartConfig.yAxis]
       });
-      
       const indices = detectRes.data.anomaly_indices;
       setAnomalies(indices);
 
@@ -101,18 +96,18 @@ function App() {
           )}
           <div className="logo">
             <Brain className="logo-icon" />
-            <h1>Insight<span>Dashboard</span></h1>
+            <span>InsightDashboard</span>
           </div>
         </div>
       </header>
 
-      <main className="dashboard-grid">
+      <main className="dashboard-body">
         {!data.length ? (
           <div className="welcome-screen">
             {isLoading ? (
-              <div className="loading-overlay">
+              <div className="loading-state">
                 <div className="spinner"></div>
-                <p>Analyzing Dataset...</p>
+                <p style={{color: 'var(--text-muted)'}}>Analyzing Dataset...</p>
               </div>
             ) : (
               <FileUpload onUploadSuccess={handleUploadSuccess} />
@@ -120,70 +115,65 @@ function App() {
           </div>
         ) : (
           <>
-            <section className="control-panel">
-              <ColumnSelector 
-                schema={schema} 
-                activeConfig={chartConfig} 
-                onApplyConfig={(newConfig) => setChartConfig(newConfig)}
-                onRunAnomalies={runAnomalyDetection}
-              />
-              
-              <div className="stats-card">
-                <div className="card-header">
-                  <BarChart size={18} />
-                  <h4>Data Insights</h4>
-                </div>
+            <aside className="sidebar">
+              <div className="card">
+                <ColumnSelector 
+                  schema={schema} 
+                  activeConfig={chartConfig} 
+                  onApplyConfig={(newConfig) => setChartConfig(newConfig)}
+                  onRunAnomalies={runAnomalyDetection}
+                />
+              </div>
+
+              <div className="card">
+                <h3 className="card-title"><BarChart size={16}/> Data Insights</h3>
                 <div className="stats-grid">
                   {stats[chartConfig.yAxis] && (
                     <>
                       <div className="stat-item">
                         <label>Mean</label>
-                        <span>{stats[chartConfig.yAxis].mean.toLocaleString()}</span>
+                        <span className="stat-value">{stats[chartConfig.yAxis].mean.toLocaleString()}</span>
                       </div>
                       <div className="stat-item">
                         <label>Median</label>
-                        <span>{stats[chartConfig.yAxis].median.toLocaleString()}</span>
+                        <span className="stat-value">{stats[chartConfig.yAxis].median.toLocaleString()}</span>
                       </div>
                     </>
                   )}
-                  <div className="stat-item highlight">
+                  <div className="stat-item">
                     <label>Anomalies</label>
-                    <span className={anomalies.length > 0 ? 'text-error' : ''}>
-                      {anomalies.length} Found
+                    <span className={`stat-value ${anomalies.length > 0 ? 'text-error' : ''}`}>
+                      {anomalies.length}
                     </span>
                   </div>
                   <div className="stat-item">
                     <label>Total Rows</label>
-                    <span>{data.length}</span>
+                    <span className="stat-value">{data.length}</span>
                   </div>
                 </div>
               </div>
 
               {aiInsight && (
-                <div className="insight-card">
-                  <div className="card-header">
-                    <Info size={18} />
-                    <h4>AI Summary</h4>
-                  </div>
-                  <p className="summary">{aiInsight.summary}</p>
+                <div className="card">
+                  <h3 className="card-title"><Info size={16}/> AI Summary</h3>
+                  <p className="ai-summary-text">{aiInsight.summary}</p>
                 </div>
               )}
-            </section>
+            </aside>
 
-            <section className="visualizer-panel">
-              <div className="panel-header">
-                <LayoutDashboard size={20} />
-                <h3>Visualization</h3>
+            <section className="main-view">
+              <div className="card chart-card">
+                <h3 className="card-title"><LayoutDashboard size={16}/> Visualization</h3>
+                <div className="chart-wrapper">
+                  <ChartViewer data={data} config={chartConfig} />
+                </div>
               </div>
-              <ChartViewer data={data} config={chartConfig} />
             </section>
           </>
         )}
       </main>
 
-      {isLoading && data.length > 0 && (
-        <div className="loading-bar-top"></div>
-      )}
+      {isLoading && data.length > 0 && <div className="loading-bar-top"></div>}
     </div>
   );
 }
