@@ -88,15 +88,17 @@ function App() {
   return (
     <div className="app-container">
       <header className="app-header">
-        <div className="logo-section">
-          {data.length > 0 && (
-            <button onClick={resetDashboard} className="back-btn" title="Back to Upload">
-              <ArrowLeft size={20} />
-            </button>
-          )}
-          <div className="logo">
-            <Brain className="logo-icon" />
-            <span>InsightDashboard</span>
+        <div className="header-content">
+          <div className="logo-section">
+            {data.length > 0 && (
+              <button onClick={resetDashboard} className="back-btn" title="Back to Upload">
+                <ArrowLeft size={20} />
+              </button>
+            )}
+            <div className="logo">
+              <Brain className="logo-icon" />
+              <span>InsightDashboard</span>
+            </div>
           </div>
         </div>
       </header>
