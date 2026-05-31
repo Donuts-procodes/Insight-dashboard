@@ -103,7 +103,7 @@ function App() {
         </div>
       </header>
 
-      <main className="dashboard-body">
+      <main className={`dashboard-body ${!data.length ? 'welcome-state' : ''}`}>
         {!data.length ? (
           <div className="welcome-screen">
             {isLoading ? (
