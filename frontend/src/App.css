@@ -69,7 +69,7 @@ body {
   color: var(--text);
   padding: 0.6rem 1.25rem;
   border-radius: 2rem;
-  display: flex;
+  display: center;
   align-items: center;
   gap: 0.75rem;
   cursor: pointer;
@@ -168,7 +168,7 @@ section {
 .modal-content {
   background: var(--card-bg);
   width: 100%;
-  max-width: 1200px;
+  max-width: 1400px;
   height: 90vh;
   border-radius: 2rem;
   border: 1px solid var(--border);
@@ -188,8 +188,8 @@ section {
 
 .modal-body {
   flex: 1;
-  overflow: auto;
-  padding: 1rem;
+  overflow: hidden;
+  padding: 0;
 }
 
 .close-btn {
@@ -295,9 +295,44 @@ section {
   flex-direction: column;
 }
 
-.table-container {
+.table-wrapper-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   width: 100%;
+}
+
+.table-pagination-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: #1e1f20;
+  border-bottom: 1px solid var(--border);
+}
+
+.pagination-controls {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.p-btn {
+  background: #28292a;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.4rem;
+  border-radius: 0.4rem;
+  cursor: pointer;
+  display: flex;
+}
+
+.p-btn:disabled { opacity: 0.3; cursor: not-allowed; }
+
+.table-container {
+  flex: 1;
   overflow: auto;
+  background: #131314;
 }
 
 table {
@@ -317,6 +352,7 @@ th {
   border-bottom: 1px solid var(--border);
   color: var(--text-light);
   white-space: nowrap;
+  z-index: 10;
 }
 
 td {
@@ -331,15 +367,6 @@ tr:hover {
 
 .anomaly-row {
   background-color: var(--anomaly) !important;
-}
-
-.table-warning {
-  padding: 1rem;
-  background: rgba(242, 139, 130, 0.1);
-  border-radius: 0.5rem;
-  color: var(--error);
-  font-size: 0.8rem;
-  margin-bottom: 1rem;
 }
 
 .chart-placeholder {
