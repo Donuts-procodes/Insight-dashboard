@@ -86,7 +86,9 @@ def query_chart():
 
 if __name__ == "__main__":
     # Ensure environment variables are loaded
-    if not os.getenv("OPENROUTER_API_KEY"):
+    if os.getenv("OPENROUTER_API_KEY"):
+        print("SUCCESS: OPENROUTER_API_KEY loaded from environment.")
+    else:
         print("WARNING: OPENROUTER_API_KEY not found in environment.")
     
     app.run(host="0.0.0.0", port=8000, debug=True)
