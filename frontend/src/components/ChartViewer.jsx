@@ -123,8 +123,8 @@ const ChartViewer = ({ data, config }) => {
     };
 
     return (
-        <div className="chart-container" style={{ width: '100%', height: '100%', minHeight: '400px' }}>
-            <ResponsiveContainer width="100%" height="100%">
+        <div className="chart-container-wrapper">
+            <ResponsiveContainer width="99%" height="100%">
                 {renderChart()}
             </ResponsiveContainer>
         </div>
