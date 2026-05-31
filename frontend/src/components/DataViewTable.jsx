@@ -1,12 +1,21 @@
-import React from 'react';
+import React, { useRef, useMemo } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 
 const DataViewTable = ({ data, anomalies }) => {
+    const headerRef = useRef(null);
+    
     if (!data || data.length === 0) return null;
 
-    const columns = Object.keys(data[0]);
-    const columnWidth = 150; // Minimum width per column
+    const columns = useMemo(() => Object.keys(data[0]), [data]);
+    const columnWidth = 180; // Professional wider columns
+    const rowWidth = columns.length * columnWidth;
+
+    const onScroll = ({ scrollLeft }) => {
+        if (headerRef.current) {
+            headerRef.current.scrollLeft = scrollLeft;
+        }
+    };
 
     const Row = ({ index, style }) => {
         const row = data[index];
@@ -17,6 +26,7 @@ const DataViewTable = ({ data, anomalies }) => {
                 style={{ 
                     ...style, 
                     display: 'flex', 
+                    width: rowWidth,
                     borderBottom: '1px solid var(--border)',
                     backgroundColor: isAnomaly ? 'var(--anomaly)' : 'transparent'
                 }} 
@@ -32,10 +42,11 @@ const DataViewTable = ({ data, anomalies }) => {
                             textOverflow: 'ellipsis',
                             whiteSpace: 'nowrap',
                             flexShrink: 0,
-                            borderRight: '1px solid rgba(255,255,255,0.05)'
+                            borderRight: '1px solid rgba(255,255,255,0.05)',
+                            fontSize: '0.85rem'
                         }}
                     >
-                        {row[col] !== null ? String(row[col]) : ''}
+                        {row[col] !== null && row[col] !== undefined ? String(row[col]) : '-'}
                     </div>
                 ))}
             </div>
@@ -43,25 +54,42 @@ const DataViewTable = ({ data, anomalies }) => {
     };
 
     return (
-        <div className="table-wrapper-virtual">
-            <div className="table-header-virtual" style={{ display: 'flex', width: columns.length * columnWidth }}>
-                {columns.map(col => (
-                    <div 
-                        key={col} 
-                        style={{ 
-                            width: columnWidth, 
-                            padding: '1rem',
-                            background: '#28292a',
-                            fontWeight: '600',
-                            color: 'var(--text-light)',
-                            borderRight: '1px solid var(--border)',
-                            flexShrink: 0
-                        }}
-                    >
-                        {col}
-                    </div>
-                ))}
+        <div className="table-wrapper-virtual" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+            {/* Synchronized Header */}
+            <div 
+                ref={headerRef}
+                className="table-header-virtual" 
+                style={{ 
+                    display: 'flex', 
+                    overflow: 'hidden',
+                    background: '#28292a',
+                    borderBottom: '1px solid var(--border)',
+                    zIndex: 10
+                }}
+            >
+                <div style={{ display: 'flex', width: rowWidth }}>
+                    {columns.map(col => (
+                        <div 
+                            key={col} 
+                            style={{ 
+                                width: columnWidth, 
+                                padding: '1rem',
+                                fontWeight: '600',
+                                color: 'var(--text-light)',
+                                borderRight: '1px solid var(--border)',
+                                flexShrink: 0,
+                                fontSize: '0.8rem',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.5px'
+                            }}
+                        >
+                            {col}
+                        </div>
+                    ))}
+                </div>
             </div>
+            
+            {/* Virtualized Body */}
             <div className="table-body-virtual" style={{ flex: 1 }}>
                 <AutoSizer>
                     {({ height, width }) => (
@@ -70,6 +98,8 @@ const DataViewTable = ({ data, anomalies }) => {
                             itemCount={data.length}
                             itemSize={45}
                             width={width}
+                            onScroll={onScroll}
+                            className="virtual-list-container"
                         >
                             {Row}
                         </List>
@@ -79,8 +109,5 @@ const DataViewTable = ({ data, anomalies }) => {
         </div>
     );
 };
-
-// Simple AutoSizer wrapper if the library isn't installed, but we'll try to use a standard div approach if needed.
-// For now, let's assume we want a robust solution and I'll add the necessary logic.
 
 export default DataViewTable;

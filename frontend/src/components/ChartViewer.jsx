@@ -1,14 +1,35 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { 
     LineChart, Line, BarChart, Bar, ScatterChart, Scatter, 
     XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from 'recharts';
 
 const ChartViewer = ({ data, config }) => {
+    // Sanitized data for charting
+    const chartData = useMemo(() => {
+        if (!data || !config.xAxis || !config.yAxis) return [];
+        
+        return data.map(item => {
+            const yValue = parseFloat(String(item[config.yAxis]).replace(/[^0-9.-]+/g, ""));
+            return {
+                ...item,
+                [config.yAxis]: isNaN(yValue) ? 0 : yValue
+            };
+        });
+    }, [data, config.xAxis, config.yAxis]);
+
     if (!data || !config.xAxis || !config.yAxis) {
         return (
             <div className="chart-placeholder">
-                <p>Select axes or ask the AI to generate a chart</p>
+                <p>Select axes to generate visualization</p>
+            </div>
+        );
+    }
+
+    if (chartData.length === 0) {
+        return (
+            <div className="chart-placeholder">
+                <p>No valid numeric data found for selected Y-axis</p>
             </div>
         );
     }
@@ -24,7 +45,7 @@ const ChartViewer = ({ data, config }) => {
         switch (config.chartType) {
             case 'bar':
                 return (
-                    <BarChart data={data}>
+                    <BarChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} vertical={false} />
                         <XAxis dataKey={config.xAxis} stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
                         <YAxis stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
@@ -47,12 +68,12 @@ const ChartViewer = ({ data, config }) => {
                             contentStyle={{ backgroundColor: '#1e1f20', border: '1px solid #3c4043', borderRadius: '8px' }}
                         />
                         <Legend />
-                        <Scatter name="Data Points" data={data} fill={themeColors.secondary} />
+                        <Scatter name="Data Points" data={chartData} fill={themeColors.secondary} />
                     </ScatterChart>
                 );
             default: // line
                 return (
-                    <LineChart data={data}>
+                    <LineChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} vertical={false} />
                         <XAxis dataKey={config.xAxis} stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
                         <YAxis stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
@@ -66,8 +87,9 @@ const ChartViewer = ({ data, config }) => {
                             dataKey={config.yAxis} 
                             stroke={themeColors.primary} 
                             strokeWidth={3} 
-                            dot={{ fill: themeColors.primary, strokeWidth: 2, r: 4 }}
+                            dot={{ fill: themeColors.primary, strokeWidth: 2, r: 2 }}
                             activeDot={{ r: 6, strokeWidth: 0 }}
+                            connectNulls
                         />
                     </LineChart>
                 );
