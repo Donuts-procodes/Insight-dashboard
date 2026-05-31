@@ -68,7 +68,7 @@ Interact with your data using plain English.
    ```
 5. Start the server:
    ```bash
-   python app/main.py
+   python app.py
    ```
 
 ### Frontend Setup
