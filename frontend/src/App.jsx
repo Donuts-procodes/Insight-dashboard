@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Brain, LayoutDashboard, Table as TableIcon, Info } from 'lucide-react';
+import { Brain, LayoutDashboard, Table as TableIcon, Info, ArrowLeft, RefreshCw, BarChart } from 'lucide-react';
 import FileUpload from './components/FileUpload';
 import DataViewTable from './components/DataViewTable';
 import ColumnSelector from './components/ColumnSelector';
@@ -11,6 +11,7 @@ import './App.css';
 function App() {
   const [data, setData] = useState([]);
   const [schema, setSchema] = useState([]);
+  const [stats, setStats] = useState({});
   const [anomalies, setAnomalies] = useState([]);
   const [aiInsight, setAiInsight] = useState(null);
   const [chartConfig, setChartConfig] = useState({
@@ -23,8 +24,18 @@ function App() {
   const handleUploadSuccess = (payload) => {
     setData(payload.data);
     setSchema(payload.schema);
+    setStats(payload.stats || {});
     setAnomalies([]);
     setAiInsight(null);
+  };
+
+  const resetDashboard = () => {
+    setData([]);
+    setSchema([]);
+    setStats({});
+    setAnomalies([]);
+    setAiInsight(null);
+    setChartConfig({ xAxis: '', yAxis: '', chartType: 'line' });
   };
 
   const runAnomalyDetection = async () => {
@@ -64,18 +75,28 @@ function App() {
       yAxis: suggestion.y_axis,
       chartType: suggestion.chart_type
     });
-    // Auto-run anomalies for the new suggestion
-    // We'll use a timeout to ensure state is updated or just call it directly with the suggestion
   };
 
   return (
     <div className="app-container">
       <header className="app-header">
-        <div className="logo">
-          <Brain className="logo-icon" />
-          <h1>Insight<span>Dashboard</span></h1>
+        <div className="logo-section">
+          {data.length > 0 && (
+            <button onClick={resetDashboard} className="back-btn" title="Back to Upload">
+              <ArrowLeft size={20} />
+            </button>
+          )}
+          <div className="logo">
+            <Brain className="logo-icon" />
+            <h1>Insight<span>Dashboard</span></h1>
+          </div>
         </div>
         <NaturalLanguageChat schema={schema} onChartSuggestion={handleChartSuggestion} />
+        {data.length > 0 && (
+          <button onClick={resetDashboard} className="refresh-btn" title="Reset Dashboard">
+            <RefreshCw size={18} />
+          </button>
+        )}
       </header>
 
       <main className="dashboard-grid">
@@ -93,6 +114,33 @@ function App() {
                 onRunAnomalies={runAnomalyDetection}
               />
               
+              {stats[chartConfig.yAxis] && (
+                <div className="stats-card">
+                  <div className="card-header">
+                    <BarChart size={18} />
+                    <h4>Quick Stats: {chartConfig.yAxis}</h4>
+                  </div>
+                  <div className="stats-grid">
+                    <div className="stat-item">
+                      <label>Mean</label>
+                      <span>{stats[chartConfig.yAxis].mean.toLocaleString()}</span>
+                    </div>
+                    <div className="stat-item">
+                      <label>Median</label>
+                      <span>{stats[chartConfig.yAxis].median.toLocaleString()}</span>
+                    </div>
+                    <div className="stat-item">
+                      <label>Std Dev</label>
+                      <span>{stats[chartConfig.yAxis].std.toFixed(2)}</span>
+                    </div>
+                    <div className="stat-item">
+                      <label>Min/Max</label>
+                      <span>{stats[chartConfig.yAxis].min.toLocaleString()} - {stats[chartConfig.yAxis].max.toLocaleString()}</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
               {aiInsight && (
                 <div className="insight-card">
                   <div className="card-header">
@@ -121,7 +169,9 @@ function App() {
                 <h3>Raw Data Explorer</h3>
                 {anomalies.length > 0 && <span className="anomaly-badge">{anomalies.length} Anomalies Found</span>}
               </div>
-              <DataViewTable data={data} anomalies={anomalies} />
+              <div className="table-wrapper">
+                <DataViewTable data={data} anomalies={anomalies} />
+              </div>
             </section>
           </>
         )}

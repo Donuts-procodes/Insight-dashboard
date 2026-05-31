@@ -13,39 +13,62 @@ const ChartViewer = ({ data, config }) => {
         );
     }
 
+    const themeColors = {
+        primary: "#8ab4f8",
+        secondary: "#c58af9",
+        grid: "#3c4043",
+        text: "#9e9e9e"
+    };
+
     const renderChart = () => {
         switch (config.chartType) {
             case 'bar':
                 return (
                     <BarChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey={config.xAxis} />
-                        <YAxis />
-                        <Tooltip />
+                        <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} vertical={false} />
+                        <XAxis dataKey={config.xAxis} stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip 
+                            contentStyle={{ backgroundColor: '#1e1f20', border: '1px solid #3c4043', borderRadius: '8px' }}
+                            itemStyle={{ color: '#e3e3e3' }}
+                        />
                         <Legend />
-                        <Bar dataKey={config.yAxis} fill="#3b82f6" />
+                        <Bar dataKey={config.yAxis} fill={themeColors.primary} radius={[4, 4, 0, 0]} />
                     </BarChart>
                 );
             case 'scatter':
                 return (
                     <ScatterChart>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey={config.xAxis} name={config.xAxis} />
-                        <YAxis dataKey={config.yAxis} name={config.yAxis} />
-                        <Tooltip cursor={{ strokeDasharray: '3 3' }} />
+                        <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} />
+                        <XAxis dataKey={config.xAxis} name={config.xAxis} stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis dataKey={config.yAxis} name={config.yAxis} stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip 
+                            cursor={{ strokeDasharray: '3 3' }} 
+                            contentStyle={{ backgroundColor: '#1e1f20', border: '1px solid #3c4043', borderRadius: '8px' }}
+                        />
                         <Legend />
-                        <Scatter name="Data Points" data={data} fill="#3b82f6" />
+                        <Scatter name="Data Points" data={data} fill={themeColors.secondary} />
                     </ScatterChart>
                 );
             default: // line
                 return (
                     <LineChart data={data}>
-                        <CartesianGrid strokeDasharray="3 3" />
-                        <XAxis dataKey={config.xAxis} />
-                        <YAxis />
-                        <Tooltip />
+                        <CartesianGrid strokeDasharray="3 3" stroke={themeColors.grid} vertical={false} />
+                        <XAxis dataKey={config.xAxis} stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
+                        <YAxis stroke={themeColors.text} fontSize={12} tickLine={false} axisLine={false} />
+                        <Tooltip 
+                            contentStyle={{ backgroundColor: '#1e1f20', border: '1px solid #3c4043', borderRadius: '8px' }}
+                            itemStyle={{ color: '#e3e3e3' }}
+                        />
                         <Legend />
-                        <Line type="monotone" dataKey={config.yAxis} stroke="#3b82f6" strokeWidth={2} />
+                        <Line 
+                            type="monotone" 
+                            dataKey={config.yAxis} 
+                            stroke={themeColors.primary} 
+                            strokeWidth={3} 
+                            dot={{ fill: themeColors.primary, strokeWidth: 2, r: 4 }}
+                            activeDot={{ r: 6, strokeWidth: 0 }}
+                        />
                     </LineChart>
                 );
         }

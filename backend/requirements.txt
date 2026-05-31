@@ -1,8 +1,8 @@
-fastapi
-uvicorn
+flask
+flask-cors
 pandas
 openpyxl
 scikit-learn
 pydantic
-google-genai
+openai
 python-multipart

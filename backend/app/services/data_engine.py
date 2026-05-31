@@ -36,7 +36,19 @@ class DataEngine:
             for col in cat_cols:
                 df[col] = df[col].fillna(df[col].mode()[0] if not df[col].mode().empty else "Unknown")
 
-            # 5. Prepare Metadata
+            # 5. Calculate Descriptive Statistics for Numerical Columns
+            stats = {}
+            for col in num_cols:
+                stats[col] = {
+                    "mean": float(df[col].mean()),
+                    "median": float(df[col].median()),
+                    "std": float(df[col].std()),
+                    "min": float(df[col].min()),
+                    "max": float(df[col].max()),
+                    "count": int(df[col].count())
+                }
+
+            # 6. Prepare Metadata
             schema = []
             for col in df.columns:
                 schema.append({
@@ -47,6 +59,7 @@ class DataEngine:
             return {
                 "data": df.to_dict(orient='records'),
                 "schema": schema,
+                "stats": stats,
                 "row_count": len(df),
                 "column_count": len(df.columns)
             }

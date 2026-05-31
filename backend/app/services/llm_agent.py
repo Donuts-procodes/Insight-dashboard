@@ -1,7 +1,7 @@
 import os
 import json
 from typing import Dict, Any, List
-from google import genai
+from openai import OpenAI
 from pydantic import BaseModel, Field
 
 class ChartSuggestion(BaseModel):
@@ -12,18 +12,24 @@ class ChartSuggestion(BaseModel):
 
 class AnomalyExplanation(BaseModel):
     summary: str = Field(description="A concise, high-level summary of the anomalies detected")
-    insights: List[str] = Field(description="A list of specific observations (e.g., 'Revenue dropped 45% on Oct 14th')")
+    insights: List[str] = Field(description="A list of specific observations")
 
 class LLMAgent:
     def __init__(self):
-        api_key = os.getenv("GOOGLE_API_KEY")
+        api_key = os.getenv("OPENROUTER_API_KEY")
         if not api_key:
-            raise ValueError("GOOGLE_API_KEY environment variable not set")
-        self.client = genai.Client(api_key=api_key)
-        self.model_id = "gemini-2.0-flash" 
+            raise ValueError("OPENROUTER_API_KEY environment variable not set. Please provide a valid API key.")
+        
+        self.client = OpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=api_key,
+        )
+        self.model_id = "google/gemini-2.0-flash-001" 
 
     def query_chart_logic(self, schema: List[Dict[str, str]], query: str) -> Dict[str, Any]:
-        # ... (unchanged logic) ...
+        """
+        Uses OpenRouter (Gemini 2.0) to map a natural language query to a specific chart configuration.
+        """
         try:
             schema_str = ", ".join([f"{col['name']} ({col['type']})" for col in schema])
             
@@ -34,47 +40,44 @@ class LLMAgent:
             The user wants to: "{query}"
             
             Determine the best chart type (line, bar, or scatter) and the appropriate columns for X and Y axes.
+            Return a valid JSON object matching this schema:
+            {{"chart_type": "line|bar|scatter", "x_axis": "column_name", "y_axis": "column_name", "reasoning": "string"}}
             """
 
-            response = self.client.models.generate_content(
+            response = self.client.chat.completions.create(
                 model=self.model_id,
-                contents=prompt,
-                config={
-                    "response_mime_type": "application/json",
-                    "response_schema": ChartSuggestion,
-                }
+                messages=[{"role": "user", "content": prompt}],
+                response_format={ "type": "json_object" }
             )
 
-            return response.parsed.model_dump()
+            return json.loads(response.choices[0].message.content)
 
         except Exception as e:
             raise Exception(f"LLM Agent failed to process query: {str(e)}")
 
     def explain_anomalies(self, data_sample: List[Dict[str, Any]], anomaly_indices: List[int]) -> Dict[str, Any]:
         """
-        Generates human-readable insights for detected anomalies.
+        Generates human-readable insights for detected anomalies via OpenRouter.
         """
         try:
-            anomalous_data = [data_sample[i] for i in anomaly_indices[:5]] # Limit to 5 for token efficiency
+            anomalous_data = [data_sample[i] for i in anomaly_indices[:5]]
             
             prompt = f"""
             Analyze these detected anomalies in a dataset:
             {json.dumps(anomalous_data)}
             
             Provide a concise summary and specific insights. 
-            Example insight: "Revenue dropped 45% below the moving average on Oct 14th."
+            Return a valid JSON object matching this schema:
+            {{"summary": "string", "insights": ["string", "string"]}}
             """
 
-            response = self.client.models.generate_content(
+            response = self.client.chat.completions.create(
                 model=self.model_id,
-                contents=prompt,
-                config={
-                    "response_mime_type": "application/json",
-                    "response_schema": AnomalyExplanation,
-                }
+                messages=[{"role": "user", "content": prompt}],
+                response_format={ "type": "json_object" }
             )
 
-            return response.parsed.model_dump()
+            return json.loads(response.choices[0].message.content)
 
         except Exception as e:
             raise Exception(f"LLM Agent failed to explain anomalies: {str(e)}")
