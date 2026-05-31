@@ -242,6 +242,57 @@ section {
   align-items: center;
 }
 
+/* Upload Zone */
+.upload-zone {
+  width: 100%;
+  max-width: 600px;
+  height: 350px;
+  border: 2px dashed var(--border);
+  border-radius: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.upload-zone:hover, .upload-zone.dragging {
+  border-color: var(--primary);
+  background: rgba(138, 180, 248, 0.05);
+}
+
+.upload-content {
+  text-align: center;
+  width: 100%;
+}
+
+.upload-content h3 { 
+  font-weight: 400; 
+  color: var(--text); 
+  margin-top: 1rem;
+}
+
+.upload-content p { 
+  color: var(--text-light); 
+  font-size: 0.9rem;
+}
+
+.icon { color: var(--primary); }
+.icon.success { color: var(--success); }
+.icon.error { color: var(--error); }
+
+.btn-small {
+  margin-top: 1.5rem;
+  background: #28292a;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
 /* Chart Container Fix */
 .chart-container {
   flex: 1;
