@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Brain, LayoutDashboard, Info, ArrowLeft, BarChart, Eye, Target, X } from 'lucide-react';
+import { Brain, LayoutDashboard, Info, ArrowLeft, BarChart, Target } from 'lucide-react';
 import FileUpload from './components/FileUpload';
-import DataViewTable from './components/DataViewTable';
 import ColumnSelector from './components/ColumnSelector';
 import ChartViewer from './components/ChartViewer';
 import './App.css';
@@ -19,11 +18,9 @@ function App() {
     chartType: 'line'
   });
   const [isLoading, setIsLoading] = useState(false);
-  const [showFullTable, setShowFullTable] = useState(false);
 
   const handleUploadSuccess = (payload) => {
     setIsLoading(true);
-    // Simulated processing delay for better UX
     setTimeout(() => {
       setData(payload.data);
       setSchema(payload.schema);
@@ -66,7 +63,7 @@ function App() {
         setAiInsight({ summary: "No significant anomalies detected in the selected data.", insights: [] });
       }
     } catch (err) {
-      console.error("Anomaly detection pipeline failed", err);
+      console.error("Anomaly detection failed", err);
     } finally {
       setIsLoading(false);
     }
@@ -86,13 +83,6 @@ function App() {
             <h1>Insight<span>Dashboard</span></h1>
           </div>
         </div>
-        
-        {data.length > 0 && (
-          <button onClick={() => setShowFullTable(true)} className="view-table-btn">
-            <Eye size={18} />
-            View Full Table
-          </button>
-        )}
       </header>
 
       <main className="dashboard-grid">
@@ -169,20 +159,6 @@ function App() {
           </>
         )}
       </main>
-
-      {showFullTable && (
-        <div className="modal-overlay">
-          <div className="modal-content">
-            <div className="modal-header">
-              <h3><TableIcon size={20} /> Complete Dataset</h3>
-              <button onClick={() => setShowFullTable(false)} className="close-btn"><X size={24} /></button>
-            </div>
-            <div className="modal-body">
-              <DataViewTable data={data} anomalies={anomalies} />
-            </div>
-          </div>
-        </div>
-      )}
 
       {isLoading && data.length > 0 && (
         <div className="loading-bar-top"></div>

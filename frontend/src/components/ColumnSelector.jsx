@@ -9,7 +9,7 @@ const ColumnSelector = ({ schema, config, setConfig, onRunAnomalies }) => {
     return (
         <div className="column-selector">
             <div className="selection-group">
-                <h4><BarChart2 size={18} /> Chart Axes</h4>
+                <h4><BarChart2 size={18} /> Chart Settings</h4>
                 <div className="controls">
                     <select 
                         value={config.xAxis} 
@@ -33,7 +33,9 @@ const ColumnSelector = ({ schema, config, setConfig, onRunAnomalies }) => {
                     >
                         <option value="line">Line Chart</option>
                         <option value="bar">Bar Chart</option>
+                        <option value="area">Area Chart</option>
                         <option value="scatter">Scatter Plot</option>
+                        <option value="pie">Pie Chart (Y-Axis Categories)</option>
                     </select>
                 </div>
             </div>
