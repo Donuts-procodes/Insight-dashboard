@@ -16,7 +16,7 @@ body {
   font-family: 'Google Sans', 'Inter', sans-serif;
   background-color: var(--bg);
   color: var(--text);
-  overflow: hidden; /* Prevent body scroll */
+  overflow: hidden; 
 }
 
 .app-container {
@@ -76,14 +76,13 @@ body {
   font-size: 0.9rem;
 }
 
-/* Dashboard Grid */
 .dashboard-grid {
   display: grid;
   grid-template-columns: 350px 1fr;
   gap: 1rem;
   padding: 1rem;
   flex: 1;
-  overflow: hidden; /* Container holds panels */
+  overflow: hidden;
 }
 
 section {
@@ -119,7 +118,6 @@ section {
   letter-spacing: 1px;
 }
 
-/* Stats Card */
 .stats-card {
   background: rgba(138, 180, 248, 0.03);
   border: 1px solid var(--border);
@@ -152,7 +150,6 @@ section {
 
 .text-error { color: var(--error); }
 
-/* Modal */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -202,7 +199,6 @@ section {
   cursor: pointer;
 }
 
-/* Loading */
 .loading-overlay {
   text-align: center;
 }
@@ -242,7 +238,6 @@ section {
   align-items: center;
 }
 
-/* Upload Zone */
 .upload-zone {
   width: 100%;
   max-width: 600px;
@@ -293,8 +288,65 @@ section {
   cursor: pointer;
 }
 
-/* Chart Container Fix */
 .chart-container {
   flex: 1;
-  min-height: 0; /* Important for flex/grid behavior */
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.table-container {
+  width: 100%;
+  overflow: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  color: var(--text);
+}
+
+th {
+  text-align: left;
+  padding: 1rem;
+  background: #28292a;
+  position: sticky;
+  top: 0;
+  font-weight: 500;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-light);
+  white-space: nowrap;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+tr:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.anomaly-row {
+  background-color: var(--anomaly) !important;
+}
+
+.table-warning {
+  padding: 1rem;
+  background: rgba(242, 139, 130, 0.1);
+  border-radius: 0.5rem;
+  color: var(--error);
+  font-size: 0.8rem;
+  margin-bottom: 1rem;
+}
+
+.chart-placeholder {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  font-style: italic;
 }
