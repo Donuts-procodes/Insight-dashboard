@@ -22,11 +22,32 @@ function App() {
   const handleUploadSuccess = (payload) => {
     setIsLoading(true);
     setTimeout(() => {
-      setData(payload.data);
-      setSchema(payload.schema);
+      const data = payload.data;
+      const schema = payload.schema;
+      
+      setData(data);
+      setSchema(schema);
       setStats(payload.stats || {});
       setAnomalies([]);
       setAiInsight(null);
+
+      // --- Smart Auto-Configuration ---
+      if (schema && schema.length >= 2) {
+        // Try to find a numeric column for Y-axis
+        const numCol = schema.find(col => 
+          col.type.includes('int') || col.type.includes('float') || col.type.includes('number')
+        );
+        
+        const xAxis = schema[0].name;
+        const yAxis = numCol ? numCol.name : schema[1].name;
+
+        setChartConfig({
+          xAxis: xAxis,
+          yAxis: yAxis,
+          chartType: 'line'
+        });
+      }
+
       setIsLoading(false);
     }, 1500);
   };

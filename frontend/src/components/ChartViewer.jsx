@@ -15,7 +15,7 @@ const ChartViewer = ({ data, config }) => {
     };
 
     const chartData = useMemo(() => {
-        if (!data || !config.xAxis || !config.yAxis) return [];
+        if (!data || !config.xAxis || !config.yAxis || data.length === 0) return [];
         
         // Special processing for Pie Chart (Category counts on Y-Axis)
         if (config.chartType === 'pie') {
@@ -24,15 +24,23 @@ const ChartViewer = ({ data, config }) => {
                 const val = String(item[config.yAxis] || 'Unknown');
                 counts[val] = (counts[val] || 0) + 1;
             });
-            return Object.entries(counts).map(([name, value]) => ({ name, value })).slice(0, 10);
+            return Object.entries(counts)
+                .map(([name, value]) => ({ name, value }))
+                .sort((a, b) => b.value - a.value)
+                .slice(0, 8);
         }
 
         // Standard numeric sanitization for other charts
-        return data.map(item => {
-            const yRaw = String(item[config.yAxis] || "0");
-            const yValue = parseFloat(yRaw.replace(/[^0-9.-]+/g, ""));
+        // We only take the first 500 points for chart performance if it's not a scatter
+        const dataSet = config.chartType === 'scatter' ? data : data.slice(0, 500);
+
+        return dataSet.map(item => {
+            const yRaw = String(item[config.yAxis]);
+            // Extract numbers including decimals and negative signs
+            const yValue = parseFloat(yRaw.replace(/[^\d.-]/g, ""));
             return {
                 ...item,
+                [config.xAxis]: item[config.xAxis],
                 [config.yAxis]: isNaN(yValue) ? 0 : yValue
             };
         });
